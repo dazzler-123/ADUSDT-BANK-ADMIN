@@ -1,0 +1,817 @@
+{
+    "columnConfig": 4,
+    "formSubmitAPIURL": "",
+    "formElementsConfig": [
+        {
+            "entityName": "valuedate",
+            "entityDatatype": "",
+            "component": "date",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "valuedate",
+            "validation": {
+                "required": {
+                    "value": true,
+                    "message": "value date is required"
+                }
+            },
+            "action": true,
+            "isReadOnly": false,
+            "dynamicRules": {
+                "Max Rules": {
+                    "dependsOn": "SIP Date",
+                    "condition": "equals",
+                    "compute": "date.addDays",
+                    "value": "10"
+                },
+                "Min Rules": {
+                    "dependsOn": "SIP Date",
+                    "condition": "equals",
+                    "compute": "date.subtractDays",
+                    "value": "5"
+                }
+            },
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": null
+            },
+            "maxAge": "",
+            "minAge": "",
+            "label": "Value Date"
+        },
+        {
+            "entityName": "platform",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "platform",
+            "options": [],
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "platform is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "isReadOnly": false,
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": {
+                    "dependsOn": "optforstep",
+                    "condition": "equals",
+                    "value": "Account Number",
+                    "valueType": "Number"
+                }
+            },
+            "label": "platform"
+        },
+        {
+            "entityName": "fee",
+            "entityDatatype": "",
+            "component": "featuredtext",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "fee",
+            "label": "Value Date",
+            "decimalPrecision": "",
+            "thousandSeparator": false,
+            "prefix": "",
+            "suffix": "",
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "fee is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "isReadOnly": true,
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null
+            }
+        },
+        {
+            "entityName": "introducedby",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "introducedby",
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "introducedby is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null
+            },
+            "isReadOnly": false,
+            "label": "Introduced By",
+            "defaultValue": "MOSL"
+        },
+        {
+            "entityName": "ordersourcedby",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "ordersourcedby",
+            "label": "Order Source",
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "ordersourcedby is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "isReadOnly": false,
+            "defaultValue": "MOSL",
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null
+            }
+        },
+        {
+            "entityName": "sbroker",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {
+                "entityName": "broker"
+            },
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "sbroker",
+            "label": "Sub broker",
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "subbroker is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "defaultValue": "MOSL",
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": {
+                    "dependsOn": "optforstep",
+                    "condition": "equals",
+                    "value": "false",
+                    "valueType": "Boolean"
+                }
+            }
+        },
+        {
+            "entityName": "physicalformnumber",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "physicalformnumber",
+            "label": "physical form number",
+            "validation": {
+                "required": {
+                    "value": true,
+                    "message": "physical form number is required"
+                },
+                "minLength": {
+                    "value": "1",
+                    "message": "Minimum length is 1 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "defaultValue": "",
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": null
+            }
+        },
+        {
+            "entityName": "optforstep",
+            "entityDatatype": "",
+            "component": "checkbox",
+            "properties": {
+                "entityName": "optforstepp"
+            },
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "optforstep",
+            "label": "opt for  step",
+            "checkboxid": "chkActive",
+            "checkboxname": "chkActive",
+            "checkeddefaultval": false,
+            "checklabel": "Active",
+            "action": true,
+            "isReadOnly": false,
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null
+            },
+            "checkboxtext": ""
+        },
+        {
+            "entityName": "stepupby",
+            "entityDatatype": "",
+            "component": "staticDropdown",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "isReadOnly": false,
+            "dispatchername": "stepupby",
+            "label": "Step Up By",
+            "options": [
+                {
+                    "value": "1000",
+                    "text": "1000",
+                    "isDefaultOption": false
+                },
+                {
+                    "value": "2000",
+                    "text": "2000",
+                    "isDefaultOption": true
+                },
+                {
+                    "value": "3000",
+                    "text": "3000",
+                    "isDefaultOption": false
+                }
+            ],
+            "validation": {
+                "required": {
+                    "message": "Step Up By is required"
+                }
+            },
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": null
+            },
+            "action": true
+        },
+        {
+            "entityName": "stepupfrequency",
+            "entityDatatype": "",
+            "component": "staticDropdown",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "isReadOnly": false,
+            "dispatchername": "stepupfrequency",
+            "label": "Step Up Frequency",
+            "options": [
+                {
+                    "value": "monthly",
+                    "text": "Monthly",
+                    "isDefaultOption": true
+                },
+                {
+                    "value": "yearly",
+                    "text": "Yearly",
+                    "isDefaultOption": false
+                }
+            ],
+            "validation": {
+                "required": {
+                    "message": "Step Up Frequency is required"
+                }
+            },
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": null
+            },
+            "action": true
+        },
+        {
+            "entityName": "stepupvalue",
+            "entityDatatype": "",
+            "component": "text",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "stepupvalue",
+            "label": "Step Up Value",
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "stepupvalue is required"
+                },
+                "minLength": {
+                    "value": 0,
+                    "message": "Minimum length is 0 characters"
+                },
+                "maxLength": {
+                    "value": 100,
+                    "message": "Maximum length is 100 characters"
+                }
+            },
+            "action": true,
+            "defaultValue": "",
+            "dynamicBehavior": {
+                "disable": {
+                    "dependsOn": "optforstep",
+                    "condition": "equals",
+                    "value": "false",
+                    "valueType": "Boolean"
+                },
+                "reset": {
+                    "dependsOn": "optforstep",
+                    "condition": "equals",
+                    "value": "false",
+                    "valueType": "Boolean"
+                },
+                "mandatory": null
+            },
+            "placeholder": "Enter Step up value"
+        },
+        {
+            "entityName": "executionmode",
+            "entityDatatype": "",
+            "component": "radio",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "executionmode",
+            "label": "Execution Mode",
+            "defaultValue": " Physical",
+            "radiooptions": [
+                {
+                    "option1": " Physical",
+                    "option1id": " Physical",
+                    "checked": false,
+                    "optionlabel": " Physical"
+                },
+                {
+                    "option1": "Demat",
+                    "option1id": "Demat",
+                    "checked": false,
+                    "optionlabel": "Demat"
+                }
+            ],
+            "radiogroup": "execution mode",
+            "action": true,
+            "isReadOnly": false
+        },
+        {
+            "entityName": "communicationtype",
+            "entityDatatype": "",
+            "component": "dropdown",
+            "properties": {},
+            "isFromAPI": false,
+            "isHide": false,
+            "dispatchername": "communicationtype",
+            "label": "Communication Address",
+            "options": [],
+            "validation": {
+                "required": {
+                    "value": false,
+                    "message": "Communication Address is required"
+                }
+            },
+            "action": true,
+            "defaultValue": 3,
+            "dynamicBehavior": {
+                "disable": null,
+                "reset": null,
+                "mandatory": null
+            },
+            "fetchdataapiurl": "https://frontoffice.milessoft.com:8090/api/common/getThirdPartyMasterData",
+            "requestParam": [
+                {
+                    "fieldName": "ProductType",
+                    "defaultValue": "MF",
+                    "fieldNametoBindValue": "",
+                    "IsSearchDropDownField": ""
+                },
+                {
+                    "fieldName": "ClientCode",
+                    "defaultValue": "35",
+                    "fieldNametoBindValue": "",
+                    "IsSearchDropDownField": ""
+                }
+            ],
+            "responseParam": {
+                "Value": "ModeId",
+                "Text": "Mode"
+            },
+            "relativeTPAPIUrl": "Order/CommunicationType"
+        },
+        {
+            "label": "Nominee Details_UDF",
+            "component": "dynamicTable",
+            "tableId": "Nominee Details_UDF",
+            "dispatchername": "nomineedetails_udf",
+            "columns": [
+                {
+                    "label": "Name",
+                    "component": "text",
+                    "placeholder": "Enter Nominee Name",
+                    "dispatchername": "name_nomineedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "name is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "256",
+                            "message": "Maximum length is 256 characters"
+                        },
+                        "pattern": {
+                            "value": "^[\\p{L}\\p{M}\\s]+$",
+                            "message": "Only alphabets with spaces are allowed."
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "name_nomineedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Age",
+                    "component": "date",
+                    "placeholder": "Enter Nominee Name",
+                    "dispatchername": "age_nomineedetails_udf",
+                    "maxAge": "95",
+                    "minAge": "18",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "age is required"
+                        }
+                    },
+                    "dynamicRules": {
+                        "Max Rules": null,
+                        "Min Rules": null
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "age_nomineedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "PAN Card",
+                    "component": "text",
+                    "placeholder": "Enter PAN Card Number",
+                    "dispatchername": "pancard_nomineedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "pan card is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "10",
+                            "message": "Maximum length is 10 characters"
+                        },
+                        "pattern": {
+                            "value": "[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}",
+                            "message": "Please enter Valid PAN Number as AAAAA1234A Format only"
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "pancard_nomineedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Relationship",
+                    "component": "dropdown",
+                    "fetchdataapiurl": "http://frontoffice.milessoft.com:8080/api/udfConfigurator/entityMaster",
+                    "options": [],
+                    "dispatchername": "relationship_nomineedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": false,
+                            "message": "Relationship is required"
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "relationship_nomineedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Percentage",
+                    "component": "text",
+                    "placeholder": "Enter Percentage",
+                    "defaultValue": 1,
+                    "dispatchername": "percentage_nomineedetails_udf_nomineedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": false,
+                            "message": "percentage_nomineedetails_udf_nominee details_udf is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "3",
+                            "message": "Maximum length is 3 characters"
+                        },
+                        "pattern": {
+                            "value": "^\\d*$",
+                            "message": "Only numeric characters are allowed."
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "percentage_nomineedetails_udf_nomineedetails_udf",
+                    "action": true
+                }
+            ]
+        },
+        {
+            "label": "Appointee Details_UDF",
+            "component": "dynamicTable",
+            "tableId": "Appointee Details_UDF",
+            "dispatchername": "appointeedetails_udf",
+            "columns": [
+                {
+                    "label": "Name",
+                    "component": "text",
+                    "placeholder": "Appointee Name",
+                    "dispatchername": "name_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "name is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "256",
+                            "message": "Maximum length is 256 characters"
+                        },
+                        "pattern": {
+                            "value": "^[\\p{L}\\p{M}\\s]+$",
+                            "message": "Only alphabets with spaces are allowed."
+                        }
+                    },
+                    "entityName": "name_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Age",
+                    "component": "date",
+                    "placeholder": "Appointee Name",
+                    "dispatchername": "age_appointeedetails_udf",
+                    "maxAge": "",
+                    "minAge": "",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "age is required"
+                        }
+                    },
+                    "dynamicRules": {
+                        "Max Rules": null,
+                        "Min Rules": null
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "age_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "PAN Card",
+                    "component": "text",
+                    "placeholder": "Appointee PAN Card Number",
+                    "dispatchername": "pancard_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "pan card is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "10",
+                            "message": "Maximum length is 10 characters"
+                        },
+                        "pattern": {
+                            "value": "[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}",
+                            "message": "Please enter Valid PAN Number as AAAAA1234A Format only"
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "pancard_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Relationship",
+                    "component": "dropdown",
+                    "fetchdataapiurl": "http://frontoffice.milessoft.com:8080/api/udfConfigurator/entityMaster",
+                    "options": [],
+                    "dispatchername": "relationship_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": false,
+                            "message": "Relationship is required"
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "relationship_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Name",
+                    "component": "text",
+                    "placeholder": "Guardian Name",
+                    "dispatchername": "guardianname_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "name is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "256",
+                            "message": "Maximum length is 256 characters"
+                        },
+                        "pattern": {
+                            "value": "^[\\p{L}\\p{M}\\s]+$",
+                            "message": "Only alphabets with spaces are allowed."
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "guardianname_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Guardian Relationship",
+                    "component": "dropdown",
+                    "fetchdataapiurl": "http://frontoffice.milessoft.com:8080/api/udfConfigurator/entityMaster",
+                    "options": [],
+                    "dispatchername": "guardianrelationship_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "message": "Guardian Relationship is required"
+                        }
+                    },
+                    "responseParam": {},
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "guardianrelationship_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Guardian Age",
+                    "component": "date",
+                    "dispatchername": "guardianage_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": true,
+                            "message": "guardian age is required"
+                        }
+                    },
+                    "dynamicRules": {
+                        "Max Rules": null,
+                        "Min Rules": null
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "guardianage_appointeedetails_udf",
+                    "action": true
+                },
+                {
+                    "label": "Guardian Address",
+                    "component": "text",
+                    "placeholder": "Guardian Address",
+                    "dispatchername": "guardianaddress_appointeedetails_udf",
+                    "validation": {
+                        "required": {
+                            "value": false,
+                            "message": "guardian address is required"
+                        },
+                        "minLength": {
+                            "value": "1",
+                            "message": "Minimum length is 1 characters"
+                        },
+                        "maxLength": {
+                            "value": "256",
+                            "message": "Maximum length is 256 characters"
+                        },
+                        "pattern": {
+                            "value": "^[\\p{L}\\p{M}\\s]+$",
+                            "message": "Only alphabets with spaces are allowed."
+                        }
+                    },
+                    "dynamicBehavior": {
+                        "disable": null,
+                        "reset": null,
+                        "mandatory": null
+                    },
+                    "entityName": "guardianaddress_appointeedetails_udf",
+                    "action": true
+                }
+            ]
+        }
+    ]
+}

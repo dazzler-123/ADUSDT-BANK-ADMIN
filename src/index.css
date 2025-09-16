@@ -1,0 +1,242 @@
+/* :root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+ 
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+ 
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ 
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+ 
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+ 
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+ 
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+ 
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+
+
+/* Login Section CSS Start*/
+.newcontainer {
+  
+  padding: 0;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.overlay-container {
+  padding: 2rem;
+  padding-top: 0rem;
+  display: contents;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.newsides {
+  width: 100%;
+  max-width: 400px;
+  margin-left: 5%;
+}
+
+.newsidesotp {
+  width: 100%;
+  max-width: 400px;
+  margin-left: 0 !important;
+  margin-top: 8% !important;
+}
+
+.headsc {
+  font-weight: bold !important;
+  text-align: center;
+  color: #2A9EDC;
+  font-size: 16px !important;
+  padding-bottom: 10px;
+}
+
+.headsc1 {
+  font-size: 13px !important;
+  font-weight: bold !important;
+  color: #000000 !important;
+  text-align: left !important;
+}
+
+.margs {
+  margin: 5px 0px 30px 0px !important;
+}
+
+.headotp {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  color: #000000 !important;
+  text-align: center !important;
+  margin-top: 1rem !important;
+}
+
+.otpverify {
+  font-size: 14px !important;
+  font-weight: bold !important;
+  color: #000000 !important;
+  text-align: center !important;
+  margin-top: 0.5rem !important;
+}
+
+.inputdesk {
+  margin-top: 0.5rem !important;
+  background-color: #fff;
+}
+
+.lgbtn {
+  background: linear-gradient(to left, #301f75, #3b2690, #4326a8, #5737c5, #6e4ce0);
+  color: white;
+  /* padding: 0.6rem 1.5rem; */
+  font-weight: bold;
+  width: 100px;
+  height: 40px;
+  text-transform: none;
+  border-radius: 4px;
+  display: block;
+  margin: 1rem auto 0;
+}
+
+.otp-input-fields {
+  margin: auto;
+  background-color: white;
+  max-width: 400px;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+}
+
+.otp-input-fields input {
+  height: 30px;
+  width: 40px;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #2f8f1f;
+  text-align: center;
+  outline: none;
+  font-size: 16px;
+}
+
+.mrt20 {
+  margin-top: 20px;
+}
+
+.timer,
+.count {
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.lavenderc {
+  font-size: 15px !important;
+  color: #6f41f5;
+  text-decoration: none;
+}
+
+.lavenderc:hover {
+  text-decoration: underline;
+}
+
+.btnGroup {
+  text-align: center;
+}
+
+.disc {
+  font-size: 12px !important;
+  color: #333;
+  text-align: justify;
+  margin-top: 1rem !important;
+}
+
+.width80 {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.css-m1wcy2-MuiFormHelperText-root.Mui-error {
+  margin: 0px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .newcontainer {
+    margin-top: 1rem;
+  }
+
+  .overlay-container {
+    padding: 1.5rem;
+  }
+
+  .otp__digit {
+    width: 35px;
+    height: 45px;
+  }
+
+  .newsides {
+    max-width: 100%;
+    margin-right: 5%;
+  }
+
+  .newsidesotp {
+    margin-left: -10px !important;
+  }
+}
+
+/* Login Section CSS End*/
