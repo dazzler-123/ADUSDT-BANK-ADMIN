@@ -28,7 +28,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { Visibility, AttachMoney } from '@mui/icons-material';
+import { Visibility, AttachMoney, Launch } from '@mui/icons-material';
 import { getIncome } from '../APIs/authApis';
 
 const statusColor = (status) => {
@@ -57,20 +57,36 @@ const IncomeTable = () => {
         const fetchIncomes = async () => {
             setLoading(true);
             try {
+                // Format dates with proper time boundaries
+                const formatStartDate = (date) => {
+                    if (!date) return '';
+                    const startOfDay = new Date(date);
+                    startOfDay.setHours(0, 0, 0, 0);
+                    return startOfDay.toISOString();
+                };
+
+                const formatEndDate = (date) => {
+                    if (!date) return '';
+                    const endOfDay = new Date(date);
+                    endOfDay.setHours(23, 59, 59, 999);
+                    return endOfDay.toISOString();
+                };
+
                 const res = await getIncome({
                     page: page + 1,
                     limit: rowsPerPage,
                     search,
                     sortBy: sortConfig.key || '',
                     sortDir: sortConfig.direction,
-                    startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-                    endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+                    startDate: formatStartDate(startDate),
+                    endDate: formatEndDate(endDate),
                     status: statusFilter,
+                    incomeType: statusFilter
                 });
-                const list = Array.isArray(res) ? res : (res?.data || res?.items || res?.results || []);
-                const totalCount = res?.total || res?.totalCount || 0;
+                const list = Array.isArray(res) ? res : (res?.data || []);
+           
                 setIncomeData(Array.isArray(list) ? list : []);
-                setTotal(totalCount);
+                setTotal(res.totalUsers);
             } catch (error) {
                 console.error('Error fetching incomes:', error);
                 setIncomeData([]);
@@ -126,6 +142,13 @@ const IncomeTable = () => {
         }).format(amount);
     };
 
+    const handleBSCScanClick = (txHash) => {
+        if (txHash) {
+            const bscScanUrl = `https://bscscan.com/tx/${txHash}`;
+            window.open(bscScanUrl, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ p: 3, background: '#f7fafd', minHeight: '100vh' }}>
@@ -136,7 +159,10 @@ const IncomeTable = () => {
                                 placeholder="Search incomes"
                                 size="small"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(0);
+                                }}
                                 sx={{ width: '100%', background: 'white', borderRadius: 2 }}
                             />
                         </Grid>
@@ -146,13 +172,17 @@ const IncomeTable = () => {
                                 <Select
                                     value={statusFilter}
                                     label="Status"
-                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    onChange={(e) => {
+                                        setStatusFilter(e.target.value);
+                                        setPage(0);
+                                    }}
                                 >
                                     <MenuItem value="">All Status</MenuItem>
-                                    <MenuItem value="Completed">Completed</MenuItem>
-                                    <MenuItem value="Pending">Pending</MenuItem>
-                                    <MenuItem value="Failed">Failed</MenuItem>
-                                    <MenuItem value="Processing">Processing</MenuItem>
+                                    <MenuItem value="RANK">RANK</MenuItem>
+                                    <MenuItem value="LEVEL">LEVEL</MenuItem>
+                                    <MenuItem value="DIRECT">DIRECT</MenuItem>
+                                    <MenuItem value="ADMIN">ADMIN</MenuItem>
+                                    <MenuItem value="ROYALITY">ROYALITY</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -160,7 +190,10 @@ const IncomeTable = () => {
                             <DatePicker
                                 label="Start Date"
                                 value={startDate}
-                                onChange={(newValue) => setStartDate(newValue)}
+                                onChange={(newValue) => {
+                                    setStartDate(newValue);
+                                    setPage(0);
+                                }}
                                 slotProps={{
                                     textField: {
                                         size: 'small',
@@ -173,7 +206,10 @@ const IncomeTable = () => {
                             <DatePicker
                                 label="End Date"
                                 value={endDate}
-                                onChange={(newValue) => setEndDate(newValue)}
+                                onChange={(newValue) => {
+                                    setEndDate(newValue);
+                                    setPage(0);
+                                }}
                                 slotProps={{
                                     textField: {
                                         size: 'small',
@@ -193,150 +229,179 @@ const IncomeTable = () => {
                         </Grid>
                     </Grid>
                 </Box>
-            
-            <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell onClick={() => handleSort('userName')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
-                                User Name {sortConfig.key === 'userName' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
-                            </TableCell>
-                            <TableCell onClick={() => handleSort('amount')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
-                                Amount {sortConfig.key === 'amount' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
-                            </TableCell>
-                            <TableCell onClick={() => handleSort('type')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
-                                Type {sortConfig.key === 'type' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
-                            </TableCell>
-                            <TableCell onClick={() => handleSort('createdAt')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
-                                Date {sortConfig.key === 'createdAt' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
-                            </TableCell>
-                            <TableCell onClick={() => handleSort('status')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
-                                Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
-                            </TableCell>
-                            <TableCell style={{ fontSize: '13px', padding: '6px 8px' }}>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {loading && (
+
+                <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
+                    <Table>
+                        <TableHead>
                             <TableRow>
-                                <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                                    <CircularProgress size={28} />
+                                <TableCell></TableCell>
+                                <TableCell onClick={() => handleSort('userName')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
+                                    User Name {sortConfig.key === 'userName' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                                 </TableCell>
+                                <TableCell onClick={() => handleSort('amount')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
+                                    Amount {sortConfig.key === 'amount' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('type')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
+                                    Type {sortConfig.key === 'type' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('createdAt')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
+                                    Date {sortConfig.key === 'createdAt' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('status')} style={{ cursor: 'pointer', fontSize: '13px', padding: '6px 8px' }}>
+                                    Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                                </TableCell>
+                                <TableCell style={{ fontSize: '13px', padding: '6px 8px' }}>Action</TableCell>
                             </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {loading && (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                                        <CircularProgress size={28} />
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            {!loading && incomeData.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                                        No income records found
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            {!loading && incomeData.map((income) => (
+                                <TableRow
+                                    key={income?._id || income?.id}
+                                    hover
+                                    sx={{ '& > *': { borderBottom: 'unset', fontSize: '13px', padding: '6px 8px' } }}
+                                >
+                                    <TableCell>
+                                        <AttachMoney sx={{ color: 'green', fontSize: 20 }} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                            {income?.userName || income?.name || income?.userId || 'N/A'}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'green' }}>
+                                            {formatCurrency(income?.amount)}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">
+                                            {income?.type || income?.incomeType || 'N/A'}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        {income?.createdAt ? new Date(income?.createdAt).toLocaleString() : 'N/A'}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={'Completed'}
+                                            color={statusColor('Completed')}
+                                            size="small"
+                                            sx={{ fontWeight: 400, fontSize: 11, height: 22 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            aria-label="View details"
+                                            onClick={() => handleOpenDetails(income)}
+                                            size="small"
+                                        >
+                                            <Visibility fontSize="small" />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <TablePagination
+                        component="div"
+                        count={total}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        rowsPerPageOptions={[5, 10, 25, 50]}
+                    />
+                </TableContainer>
+
+                <Dialog open={detailOpen} onClose={handleCloseDetails} maxWidth="md" fullWidth>
+                    <DialogTitle>Income Details</DialogTitle>
+                    <DialogContent dividers>
+                        {selectedIncome && (
+                            <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr', rowGap: 1.5, columnGap: 2 }}>
+                                <Typography variant="body2" color="text.secondary">ID</Typography>
+                                <Typography variant="body2">{selectedIncome?._id || selectedIncome?.id || ''}</Typography>
+
+                                <Typography variant="body2" color="text.secondary">User Name</Typography>
+                                <Typography variant="body2">{selectedIncome?.userName || selectedIncome?.user?.name || selectedIncome?.userId || ''}</Typography>
+
+                                <Typography variant="body2" color="text.secondary">Amount</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600, color: 'green' }}>
+                                    {formatCurrency(selectedIncome?.amount)}
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">Type</Typography>
+                                <Typography variant="body2">{selectedIncome?.type || selectedIncome?.incomeType || ''}</Typography>
+
+                                <Typography variant="body2" color="text.secondary">Description</Typography>
+                                <Typography variant="body2">{selectedIncome?.description || ''}</Typography>
+
+                                <Typography variant="body2" color="text.secondary">Status</Typography>
+                                <Typography variant="body2">{selectedIncome?.status || ''}</Typography>
+
+                                <Typography variant="body2" color="text.secondary">Transaction ID</Typography>
+                                {selectedIncome?.txHash ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                wordBreak: 'break-all',
+                                                color: 'primary.main',
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline',
+                                                '&:hover': {
+                                                    color: 'primary.dark'
+                                                }
+                                            }}
+                                            onClick={() => handleBSCScanClick(selectedIncome.txHash)}
+                                        >
+                                            {selectedIncome.txHash}
+                                        </Typography>
+                                        <Launch 
+                                            fontSize="small" 
+                                            sx={{ 
+                                                color: 'primary.main', 
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                    color: 'primary.dark'
+                                                }
+                                            }}
+                                            onClick={() => handleBSCScanClick(selectedIncome.txHash)}
+                                        />
+                                    </Box>
+                                ) : (
+                                    <Typography variant="body2">N/A</Typography>
+                                )}
+
+                                <Typography variant="body2" color="text.secondary">Created At</Typography>
+                                <Typography variant="body2">
+                                    {selectedIncome?.createdAt ? new Date(selectedIncome.createdAt).toLocaleString() : ''}
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">Updated At</Typography>
+                                <Typography variant="body2">
+                                    {selectedIncome?.updatedAt ? new Date(selectedIncome.updatedAt).toLocaleString() : ''}
+                                </Typography>
+                            </Box>
                         )}
-                        {!loading && incomeData.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={7} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                                    No income records found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                        {!loading && incomeData.map((income) => (
-                            <TableRow
-                                key={income?._id || income?.id}
-                                hover
-                                sx={{ '& > *': { borderBottom: 'unset', fontSize: '13px', padding: '6px 8px' } }}
-                            >
-                                <TableCell>
-                                    <AttachMoney sx={{ color: 'green', fontSize: 20 }} />
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                        {income?.userName || income?.user?.name || income?.userId || 'N/A'}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'green' }}>
-                                        {formatCurrency(income?.amount)}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Typography variant="body2">
-                                        {income?.type || income?.incomeType || 'N/A'}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    {income?.createdAt ? new Date(income.createdAt).toDateString() : 'N/A'}
-                                </TableCell>
-                                <TableCell>
-                                    <Chip
-                                        label={income?.status || 'Pending'}
-                                        color={statusColor(income?.status || 'Pending')}
-                                        size="small"
-                                        sx={{ fontWeight: 400, fontSize: 11, height: 22 }}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <IconButton 
-                                        aria-label="View details" 
-                                        onClick={() => handleOpenDetails(income)} 
-                                        size="small"
-                                    >
-                                        <Visibility fontSize="small" />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    component="div"
-                    count={total}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    rowsPerPageOptions={[5, 10, 25, 50]}
-                />
-            </TableContainer>
-
-            <Dialog open={detailOpen} onClose={handleCloseDetails} maxWidth="md" fullWidth>
-                <DialogTitle>Income Details</DialogTitle>
-                <DialogContent dividers>
-                    {selectedIncome && (
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr', rowGap: 1.5, columnGap: 2 }}>
-                            <Typography variant="body2" color="text.secondary">ID</Typography>
-                            <Typography variant="body2">{selectedIncome?._id || selectedIncome?.id || ''}</Typography>
-
-                            <Typography variant="body2" color="text.secondary">User Name</Typography>
-                            <Typography variant="body2">{selectedIncome?.userName || selectedIncome?.user?.name || selectedIncome?.userId || ''}</Typography>
-
-                            <Typography variant="body2" color="text.secondary">Amount</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'green' }}>
-                                {formatCurrency(selectedIncome?.amount)}
-                            </Typography>
-
-                            <Typography variant="body2" color="text.secondary">Type</Typography>
-                            <Typography variant="body2">{selectedIncome?.type || selectedIncome?.incomeType || ''}</Typography>
-
-                            <Typography variant="body2" color="text.secondary">Description</Typography>
-                            <Typography variant="body2">{selectedIncome?.description || ''}</Typography>
-
-                            <Typography variant="body2" color="text.secondary">Status</Typography>
-                            <Typography variant="body2">{selectedIncome?.status || ''}</Typography>
-
-                            <Typography variant="body2" color="text.secondary">Transaction ID</Typography>
-                            <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
-                                {selectedIncome?.transactionId || selectedIncome?.txnId || ''}
-                            </Typography>
-
-                            <Typography variant="body2" color="text.secondary">Created At</Typography>
-                            <Typography variant="body2">
-                                {selectedIncome?.createdAt ? new Date(selectedIncome.createdAt).toLocaleString() : ''}
-                            </Typography>
-
-                            <Typography variant="body2" color="text.secondary">Updated At</Typography>
-                            <Typography variant="body2">
-                                {selectedIncome?.updatedAt ? new Date(selectedIncome.updatedAt).toLocaleString() : ''}
-                            </Typography>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDetails} variant="contained">Close</Button>
-                </DialogActions>
-            </Dialog>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDetails} variant="contained">Close</Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         </LocalizationProvider>
     );

@@ -2,7 +2,8 @@
 import axios from 'axios';
 import userDetails from './userDetails';
 const api = axios.create({
-  baseURL: 'https://backend-aq8j.onrender.com/',
+  baseURL: 'https://api.12bag.com/',
+    // baseURL: 'http://localhost:3000/'
 });
 
 
@@ -52,7 +53,7 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('UserName');
       userDetails.setToken('')
-      window.location.href = '/react/';
+      window.location.href = '/';
     }    
     return Promise.reject(error?.response?.data?.message || 'Something went wrong');
   }

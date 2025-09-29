@@ -61,14 +61,29 @@ const TransactionTable = () => {
         const fetchTransactions = async () => {
             setLoading(true);
             try {
+                // Format dates with proper time boundaries
+                const formatStartDate = (date) => {
+                    if (!date) return '';
+                    const startOfDay = new Date(date);
+                    startOfDay.setHours(0, 0, 0, 0);
+                    return startOfDay.toISOString();
+                };
+
+                const formatEndDate = (date) => {
+                    if (!date) return '';
+                    const endOfDay = new Date(date);
+                    endOfDay.setHours(23, 59, 59, 999);
+                    return endOfDay.toISOString();
+                };
+
                 const res = await getTransaction({
                     page: page + 1,
                     limit: rowsPerPage,
                     search,
                     sortBy: sortConfig.key || '',
                     sortDir: sortConfig.direction,
-                    startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-                    endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+                    startDate: formatStartDate(startDate),
+                    endDate: formatEndDate(endDate),
                     status: statusFilter,
                 });
                 const list = Array.isArray(res) ? res : (res?.data || res?.items || res?.results || []);
@@ -140,7 +155,10 @@ const TransactionTable = () => {
                                 placeholder="Search transactions"
                                 size="small"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(0);
+                                }}
                                 sx={{ width: '100%', background: 'white', borderRadius: 2 }}
                             />
                         </Grid>
@@ -150,7 +168,10 @@ const TransactionTable = () => {
                                 <Select
                                     value={statusFilter}
                                     label="Status"
-                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    onChange={(e) => {
+                                        setStatusFilter(e.target.value);
+                                        setPage(0);
+                                    }}
                                 >
                                     <MenuItem value="">All Status</MenuItem>
                                     <MenuItem value="Completed">Completed</MenuItem>
@@ -165,7 +186,10 @@ const TransactionTable = () => {
                             <DatePicker
                                 label="Start Date"
                                 value={startDate}
-                                onChange={(newValue) => setStartDate(newValue)}
+                                onChange={(newValue) => {
+                                    setStartDate(newValue);
+                                    setPage(0);
+                                }}
                                 slotProps={{
                                     textField: {
                                         size: 'small',
@@ -178,7 +202,10 @@ const TransactionTable = () => {
                             <DatePicker
                                 label="End Date"
                                 value={endDate}
-                                onChange={(newValue) => setEndDate(newValue)}
+                                onChange={(newValue) => {
+                                    setEndDate(newValue);
+                                    setPage(0);
+                                }}
                                 slotProps={{
                                     textField: {
                                         size: 'small',
@@ -258,7 +285,7 @@ const TransactionTable = () => {
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Avatar sx={{ width: 30, height: 30 }} src={transaction?.user?.avatarName || transaction?.avatarName} alt={transaction?.userName || transaction?.user?.name || ''} />
                                         <Typography variant="body2">
-                                            {transaction?.userName || transaction?.user?.name || transaction?.userId || 'N/A'}
+                                            {transaction?.userId || 'N/A'}
                                         </Typography>
                                     </Box>
                                 </TableCell>

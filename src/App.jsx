@@ -13,6 +13,7 @@ import AnnouncementTable from './Screens/AnnouncementTable';
 import IncomeTable from './Screens/IncomeTable';
 import TicketTable from './Screens/TicketTable';
 import TransactionTable from './Screens/TransactionTable';
+import UserReport from './Screens/UserReport';
 const Login = lazy(() => import('./Screens/Login'));
 
 
@@ -52,6 +53,7 @@ function App() {
                     <Route path='/announcement' element={<AnnouncementTable />} />
                     <Route path='/incomes' element={<IncomeTable />} />
                     <Route path='/tickets' element={<TicketTable />} />
+                    <Route path='/users' element={<UserReport />} />
                   </Route>
                 </Route>
               </Routes>

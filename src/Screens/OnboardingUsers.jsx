@@ -27,10 +27,11 @@ import {
     MenuItem,
     Grid
 } from '@mui/material';
-import { Edit, Delete, KeyboardArrowDown, KeyboardArrowUp, VideoCall } from '@mui/icons-material';
+import { Edit, Delete, KeyboardArrowDown, KeyboardArrowUp, VideoCall, Assessment } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 // import VideoCallIcon from '@mui/icons-material/VideoCall';
 import { getAllUser } from '../APIs/appApis';
+import UserReport from './UserReport';
 
 
 
@@ -43,6 +44,7 @@ const statusColor = (status) => {
 
 const OnboardingUsers = () => {
     const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [userData,setUserData]=useState([])
     const [loading,setLoading]=useState(false)
     const [page,setPage]=useState(0)
@@ -54,18 +56,47 @@ const OnboardingUsers = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [status, setStatus] = useState('');
+    const [showReport, setShowReport] = useState(false);
+    const [reportUser, setReportUser] = useState(null);
+
+    // Debounce search - only search after 3 characters and 500ms delay
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (search.length >= 3 || search.length === 0) {
+                setDebouncedSearch(search);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [search]);
+
     useEffect(() => {
         const fetchUsers = async () => {
             setLoading(true)
             try{
+                // Format dates with proper time boundaries
+                const formatStartDate = (dateString) => {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    date.setHours(0, 0, 0, 0);
+                    return date.toISOString();
+                };
+
+                const formatEndDate = (dateString) => {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    date.setHours(23, 59, 59, 999);
+                    return date.toISOString();
+                };
+
                 const res = await getAllUser({
                     page:page+1,
                     limit: rowsPerPage,
-                    search,
+                    search: debouncedSearch,
                     sortBy: sortConfig.key || '',
                     sortDir: sortConfig.direction,
-                    startDate,
-                    endDate,
+                    startDate: formatStartDate(startDate),
+                    endDate: formatEndDate(endDate),
                     status,
                 });
                 const list = Array.isArray(res) ? res : (res?.data || res?.items || res?.results || []);
@@ -80,7 +111,7 @@ const OnboardingUsers = () => {
             }
         }
         fetchUsers()
-    }, [page, rowsPerPage, search, sortConfig, startDate, endDate, status])
+    }, [page, rowsPerPage, debouncedSearch, sortConfig, startDate, endDate, status])
 
 
     // Server-side pagination: data is already paginated from backend
@@ -113,11 +144,22 @@ const OnboardingUsers = () => {
         setSelectedUser(null)
     }
 
+    const handleViewReport = (user) => {
+        setReportUser(user)
+        setShowReport(true)
+    }
+
+    const handleCloseReport = () => {
+        setShowReport(false)
+        setReportUser(null)
+    }
+
     const handleClearFilters = () => {
         setStartDate('')
         setEndDate('')
         setStatus('')
         setSearch('')
+        setDebouncedSearch('')
         setPage(0)
     }
 
@@ -132,7 +174,10 @@ const OnboardingUsers = () => {
                             placeholder="Search by name, email, mobile"
                             size="small"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(0);
+                            }}
                             sx={{ width: '100%', background: 'white', borderRadius: 2 }}
                         />
                     </Grid>
@@ -142,7 +187,10 @@ const OnboardingUsers = () => {
                             type="date"
                             size="small"
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            onChange={(e) => {
+                                setStartDate(e.target.value);
+                                setPage(0);
+                            }}
                             InputLabelProps={{ shrink: true }}
                             sx={{ width: '100%', background: 'white', borderRadius: 2 }}
                         />
@@ -153,7 +201,10 @@ const OnboardingUsers = () => {
                             type="date"
                             size="small"
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            onChange={(e) => {
+                                setEndDate(e.target.value);
+                                setPage(0);
+                            }}
                             InputLabelProps={{ shrink: true }}
                             sx={{ width: '100%', background: 'white', borderRadius: 2 }}
                         />
@@ -163,7 +214,10 @@ const OnboardingUsers = () => {
                             <InputLabel>Status</InputLabel>
                             <Select
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value)}
+                                onChange={(e) => {
+                                    setStatus(e.target.value);
+                                    setPage(0);
+                                }}
                                 label="Status"
                             >
                                 <MenuItem value="">All Status</MenuItem>
@@ -212,7 +266,7 @@ const OnboardingUsers = () => {
                             </TableCell>
                             <TableCell style={{ fontSize: '13px', padding: '6px 8px' }}>Status</TableCell>
 
-                            <TableCell style={{ fontSize: '13px', padding: '6px 8px' }}>Action on</TableCell>
+                            <TableCell style={{ fontSize: '13px', padding: '6px 8px' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -259,9 +313,24 @@ const OnboardingUsers = () => {
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <IconButton aria-label="View details" onClick={() => handleOpenDetails(user)} size="small">
-                                            <VisibilityIcon fontSize="small" />
-                                        </IconButton>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <IconButton 
+                                                aria-label="View details" 
+                                                onClick={() => handleOpenDetails(user)} 
+                                                size="small"
+                                                sx={{ color: 'primary.main' }}
+                                            >
+                                                <VisibilityIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton 
+                                                aria-label="View report" 
+                                                onClick={() => handleViewReport(user)} 
+                                                size="small"
+                                                sx={{ color: 'success.main' }}
+                                            >
+                                                <Assessment fontSize="small" />
+                                            </IconButton>
+                                        </Box>
                                     </TableCell>
                                 </TableRow>
 
@@ -312,8 +381,9 @@ const OnboardingUsers = () => {
                             <Typography variant="body2" color="text.secondary">Total Invested</Typography>
                             <Typography variant="body2">{String(selectedUser?.totalInvested ?? '')}</Typography>
 
-                            <Typography variant="body2" color="text.secondary">Sponsor ID</Typography>
-                            <Typography variant="body2">{selectedUser?.sponsorId || ''}</Typography>
+                            <Typography variant="body2" color="text.secondary">Sponsor Name</Typography>
+                            <Typography variant="body2">{selectedUser?.sponsorId?.name || ''},  {selectedUser?.sponsorId?.email || ''}</Typography>
+                          
 
                             <Typography variant="body2" color="text.secondary">Referral Code</Typography>
                             <Typography variant="body2">{selectedUser?.referralCode || ''}</Typography>
@@ -329,6 +399,22 @@ const OnboardingUsers = () => {
                 <DialogActions>
                     <Button onClick={handleCloseDetails} variant="contained">Close</Button>
                 </DialogActions>
+            </Dialog>
+
+            {/* User Report Modal */}
+            <Dialog 
+                open={showReport} 
+                onClose={handleCloseReport} 
+                maxWidth="lg" 
+                fullWidth
+            >
+                {showReport && reportUser && (
+                    <UserReport 
+                        userId={reportUser?._id || reportUser?.id}
+                        userName={reportUser?.name || reportUser?.fullName || reportUser?.username}
+                        onBack={handleCloseReport}
+                    />
+                )}
             </Dialog>
 
         </Box>
