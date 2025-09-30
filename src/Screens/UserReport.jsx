@@ -50,7 +50,7 @@ import {
 } from '@mui/icons-material';
 import { getAllUser, getUserIncomes, getUserTransactions, getUserReferrals } from '../APIs/appApis';
 
-const UserReport = ({ userId, userName, onBack }) => {
+const UserReport = ({ userId, userName, onBack ,latestPlan,sponsorId}) => {
     const [activeTab, setActiveTab] = useState(0);
     const [incomeLoading, setIncomeLoading] = useState(false);
     const [transactionLoading, setTransactionLoading] = useState(false);
@@ -74,21 +74,7 @@ const UserReport = ({ userId, userName, onBack }) => {
 
 
 
-    const fetchUserData = useCallback(async () => {
-        try {
-            const res = await getAllUser({
-                page: 1,
-                limit: 1,
-                search: userId
-            });
-            const users = Array.isArray(res) ? res : (res?.data || []);
-            if (users.length > 0) {
-                setUserData(users[0]);
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        }
-    }, [userId]);
+  
 
     const fetchUserIncomes = useCallback(async () => {
         setIncomeLoading(true);
@@ -241,12 +227,12 @@ const UserReport = ({ userId, userName, onBack }) => {
     };
     useEffect(() => {
         if (userId) {
-            fetchUserData();
+           
             fetchUserIncomes();
             fetchUserTransactions();
             fetchUserReferrals();
         }
-    }, [userId, incomePage, transactionPage, referralPage, startDate, endDate, fetchUserData, fetchUserIncomes, fetchUserTransactions, fetchUserReferrals]);
+    }, [userId, incomePage, transactionPage, referralPage, startDate, endDate, fetchUserIncomes, fetchUserTransactions, fetchUserReferrals]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -343,6 +329,41 @@ const UserReport = ({ userId, userName, onBack }) => {
                 )}
 
                 {/* Filters */}
+                {userData?.latestPlan && (
+                    <Paper sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
+                        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600 }}>Latest Plan</Typography>
+                            <Typography variant="body2" color="text.secondary">Most recent plan details for this user</Typography>
+                        </Box>
+                        <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Plan Name</TableCell>
+                                        <TableCell>Amount (without tax)</TableCell>
+                                        <TableCell>Tx Hash</TableCell>
+                                        <TableCell>Created At</TableCell>
+                                        <TableCell>Updated At</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell>{userData?.latestPlan?.planName || 'N/A'}</TableCell>
+                                        <TableCell>{userData?.latestPlan?.planAmountWithoutTax ?? 'N/A'}</TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" sx={{ wordBreak: 'break-all', maxWidth: 420 }}>
+                                                {userData?.latestPlan?.txHash || 'N/A'}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>{userData?.latestPlan?.createdAt ? new Date(userData.latestPlan.createdAt).toLocaleString() : 'N/A'}</TableCell>
+                                        <TableCell>{userData?.latestPlan?.updatedAt ? new Date(userData.latestPlan.updatedAt).toLocaleString() : 'N/A'}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                )}
+
                 <Box sx={{ mb: 3 }}>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} sm={6} md={3}>

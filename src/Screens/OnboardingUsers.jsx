@@ -30,7 +30,7 @@ import {
 import { Edit, Delete, KeyboardArrowDown, KeyboardArrowUp, VideoCall, Assessment } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 // import VideoCallIcon from '@mui/icons-material/VideoCall';
-import { getAllUser } from '../APIs/appApis';
+import { getAllUser, confirmPendingPayment, deletePendingUser } from '../APIs/appApis';
 import UserReport from './UserReport';
 
 
@@ -58,6 +58,14 @@ const OnboardingUsers = () => {
     const [status, setStatus] = useState('');
     const [showReport, setShowReport] = useState(false);
     const [reportUser, setReportUser] = useState(null);
+    const [openPaymentModal, setOpenPaymentModal] = useState(false);
+    const [paymentForm, setPaymentForm] = useState({
+        payload: { _id: '', email: '', sponsorId:'' },
+        planName: '',
+        tnxHash: '',
+       
+    });
+    const [submittingPayment, setSubmittingPayment] = useState(false);
 
     // Debounce search - only search after 3 characters and 500ms delay
     useEffect(() => {
@@ -152,6 +160,42 @@ const OnboardingUsers = () => {
     const handleCloseReport = () => {
         setShowReport(false)
         setReportUser(null)
+    }
+
+    const handleOpenPayment = (user) => {
+        console.log(user)
+        setPaymentForm({
+            payload: { _id: user?._id || '', email: user?.email || '', sponsorId:user.sponsorId || '' ,},
+            planName: '',
+            tnxHash: '',
+           
+        })
+        setOpenPaymentModal(true)
+    }
+
+    console.log(paymentForm,"0xe7496e5bccc136d4cd66340f898b78b292b67668cc67399f7a9c9a6e5f0ddace")
+    const handleClosePayment = () => {
+        setOpenPaymentModal(false)
+    }
+
+    const handleSubmitPayment = async () => {
+        if (!paymentForm?.payload?._id || !paymentForm?.payload?.email || !paymentForm?.planName || !paymentForm?.tnxHash) {
+            alert('Please fill all fields: _id, email, planName and tnxHash')
+            return
+        }
+        try{
+            setSubmittingPayment(true)
+            await confirmPendingPayment(paymentForm)
+            setOpenPaymentModal(false)
+            // refresh list
+            setPage(0)
+            // trigger effect by toggling search
+            setDebouncedSearch((s)=> s)
+        }catch(err){
+            alert(typeof err === 'string' ? err : (Array.isArray(err)? err.join(', ') : 'Failed to submit payment'))
+        }finally{
+            setSubmittingPayment(false)
+        }
     }
 
     const handleClearFilters = () => {
@@ -322,6 +366,36 @@ const OnboardingUsers = () => {
                                             >
                                                 <VisibilityIcon fontSize="small" />
                                             </IconButton>
+                                            {user?.status === 'PENDING_PAYMENT' && (
+                                                <IconButton 
+                                                    aria-label="Confirm payment" 
+                                                    onClick={() => handleOpenPayment(user)} 
+                                                    size="small"
+                                                    sx={{ color: 'warning.main' }}
+                                                >
+                                                    <Edit fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                            {user?.status === 'PENDING_PAYMENT' && (
+                                                <IconButton 
+                                                    aria-label="Delete user" 
+                                                    onClick={async () => {
+                                                        const ok = window.confirm('Delete this pending user?')
+                                                        if (!ok) return
+                                                        try{
+                                                            await deletePendingUser({ userId: user?._id })
+                                                            setPage(0)
+                                                            setDebouncedSearch((s)=> s)
+                                                        }catch(err){
+                                                            alert(typeof err === 'string' ? err : (Array.isArray(err)? err.join(', ') : 'Failed to delete'))
+                                                        }
+                                                    }} 
+                                                    size="small"
+                                                    sx={{ color: 'error.main' }}
+                                                >
+                                                    <Delete fontSize="small" />
+                                                </IconButton>
+                                            )}
                                             <IconButton 
                                                 aria-label="View report" 
                                                 onClick={() => handleViewReport(user)} 
@@ -382,7 +456,9 @@ const OnboardingUsers = () => {
                             <Typography variant="body2">{String(selectedUser?.totalInvested ?? '')}</Typography>
 
                             <Typography variant="body2" color="text.secondary">Sponsor Name</Typography>
-                            <Typography variant="body2">{selectedUser?.sponsorId?.name || ''},  {selectedUser?.sponsorId?.email || ''}</Typography>
+                            <Typography variant="body2">{selectedUser?.sponsor?.name || ''},  {selectedUser?.sponsor?.email || ''}</Typography>
+                            <Typography variant="body2" color="text.secondary">Sponsor Id</Typography>
+                            <Typography variant="body2">{selectedUser?.sponsorId}</Typography>
                           
 
                             <Typography variant="body2" color="text.secondary">Referral Code</Typography>
@@ -413,8 +489,52 @@ const OnboardingUsers = () => {
                         userId={reportUser?._id || reportUser?.id}
                         userName={reportUser?.name || reportUser?.fullName || reportUser?.username}
                         onBack={handleCloseReport}
+                        latestPlan={reportUser.latestPlanit }
+                        
                     />
                 )}
+            </Dialog>
+
+            <Dialog open={openPaymentModal} onClose={handleClosePayment} maxWidth="xs" fullWidth>
+                <DialogTitle>Confirm Pending Payment</DialogTitle>
+                <DialogContent dividers>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                            label="User ID (_id)"
+                            size="small"
+                            value={paymentForm?.payload?._id}
+                            onChange={(e)=> setPaymentForm((prev)=> ({...prev, payload: {...prev.payload, _id: e.target.value }}))}
+                            fullWidth
+                        />
+                        <TextField
+                            label="Email"
+                            size="small"
+                            value={paymentForm?.payload?.email}
+                            onChange={(e)=> setPaymentForm((prev)=> ({...prev, payload: {...prev.payload, email: e.target.value }}))}
+                            fullWidth
+                        />
+                        <TextField
+                            label="Plan Name"
+                            size="small"
+                            value={paymentForm?.planName}
+                            onChange={(e)=> setPaymentForm((prev)=> ({...prev, planName: e.target.value }))}
+                            fullWidth
+                        />
+                        <TextField
+                            label="Transaction Hash"
+                            size="small"
+                            value={paymentForm?.tnxHash}
+                            onChange={(e)=> setPaymentForm((prev)=> ({...prev, tnxHash: e.target.value }))}
+                            fullWidth
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClosePayment} disabled={submittingPayment}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSubmitPayment} disabled={submittingPayment}>
+                        {submittingPayment ? 'Submitting...' : 'Submit'}
+                    </Button>
+                </DialogActions>
             </Dialog>
 
         </Box>

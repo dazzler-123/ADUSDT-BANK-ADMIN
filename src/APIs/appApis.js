@@ -48,3 +48,16 @@ export const getUserReferrals = async ({ userId, page = 1, limit = 10 } = {}) =>
     }
     return (await api.get('auth/admin/user-referrals', { params })).data
 }
+
+export const confirmPendingPayment = async ({ payload, planName, tnxHash } = {}) => {
+    const body = {
+        payload,
+        planName,
+        txHash:tnxHash,
+    }
+    return (await api.post('auth/complete-signup', body)).data
+}
+
+export const deletePendingUser = async ({ userId } = {}) => {
+    return (await api.delete(`auth/admin/users/${userId}`)).data
+}

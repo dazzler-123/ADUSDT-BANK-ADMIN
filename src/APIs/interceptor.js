@@ -3,7 +3,7 @@ import axios from 'axios';
 import userDetails from './userDetails';
 const api = axios.create({
   baseURL: 'https://api.12bag.com/',
-    // baseURL: 'http://localhost:3000/'
+    // baseURL: 'http://localhost:3000/' 
 });
 
 
