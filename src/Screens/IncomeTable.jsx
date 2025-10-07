@@ -279,7 +279,7 @@ const IncomeTable = () => {
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                            {income?.userName || income?.name || income?.userId || 'N/A'}
+                                            {income?.userId?.name || 'N/A'}
                                         </Typography>
                                     </TableCell>
                                     <TableCell>
