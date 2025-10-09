@@ -38,6 +38,7 @@ import TicketIcon from '@mui/icons-material/ConfirmationNumber';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 // import { useDispatch } from 'react-redux';
 // import { logout, resetForms } from '../redux/actions/actionCreators';
 
@@ -64,6 +65,7 @@ const Layout = () => {
     { text: 'All Users', path: '/users', icon: <PersonIcon /> },
     { text: 'Transactions', path: '/transactions', icon: <PolicyIcon /> },
     { text: 'Incomes', path: '/incomes', icon: <InventoryIcon /> },
+    { text: 'Income Distribution', path: '/income-distribution', icon: <TrendingUpIcon /> },
     { text: 'Announcement', path: '/announcement', icon: <AnnouncementIcon /> },
     { text: 'Tickets', path: '/tickets', icon: <TicketIcon /> },
     // { text: 'Help & Support', path: '/helpandsupport', icon: <SupportAgentIcon /> },

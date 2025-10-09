@@ -61,3 +61,15 @@ export const confirmPendingPayment = async ({ payload, planName, tnxHash } = {})
 export const deletePendingUser = async ({ userId } = {}) => {
     return (await api.delete(`auth/admin/users/${userId}`)).data
 }
+
+export const getCreditAdminIncome = async () => {
+    return (await api.post('income/credit-admin-income')).data
+}
+
+export const getCreditAdminIncome7 = async () => {
+    return (await api.post('income/credit-admin-income-7')).data
+}
+
+export const getIncomeBalances = async () => {
+    return (await api.get('income/balances')).data
+}
