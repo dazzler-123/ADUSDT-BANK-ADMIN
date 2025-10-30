@@ -17,6 +17,10 @@ export const getAllUser = async ({ page = 0, limit = 10, search = '', sortBy = '
 export const getReport = async () => {
     return (await api.get('auth/admin/report')).data
 }
+export const getReportByDate = async (startDate,endDate) => {
+    return (await api.get(`auth/income-report?startDate=${startDate}&endDate=${endDate}`)).data
+}
+
 
 export const getUserIncomes = async ({ userId, page = 1, limit = 10, startDate, endDate } = {}) => {
     const params = {

@@ -1,7 +1,7 @@
 
 
-import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Grid, Stack, Typography, Divider, CircularProgress, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Box, Card, CardContent, Grid, Stack, Typography, Divider, CircularProgress, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, TextField } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
@@ -10,7 +10,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, Legend, BarChart, Bar, Cell, PieChart, Pie, Cell as PieCell, LabelList
 } from 'recharts';
-import { getReport } from '../APIs/appApis';
+import { getReport, getReportByDate } from '../APIs/appApis';
 
 // Example data for charts
 const usersJoinedData = [
@@ -182,6 +182,9 @@ const Dashboard = () => {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [incomeData, setIncomeData] = useState(null);
 
     useEffect(() => {
         const fetchReportData = async () => {
@@ -199,6 +202,25 @@ const Dashboard = () => {
 
         fetchReportData();
     }, []);
+
+    const fetchIncomeReport = useCallback(async () => {
+        try {
+            const response = await getReportByDate(startDate, endDate);
+            if (!response) {
+                throw new Error('Failed to fetch income report');
+            }
+            const data = response
+            setIncomeData(data);
+        } catch (err) {
+            console.error('Error fetching income report:', err);
+        }
+    }, [startDate, endDate]);
+
+    useEffect(() => {
+        if (startDate && endDate) {
+            fetchIncomeReport();
+        }
+    }, [startDate, endDate, fetchIncomeReport]);
 
     if (loading) {
         return (
@@ -287,7 +309,7 @@ const Dashboard = () => {
                             <AttachMoneyIcon fontSize="large" />
                             <Box>
                                 <Typography variant="h5" fontWeight={700}>{data.summary?.totalEarned || '$0'}</Typography>
-                                <Typography variant="body2">Total Earned</Typography>
+                                <Typography variant="body2">Total Outgoing</Typography>
                                 {/* <Typography variant="caption">0% Payout done</Typography> */}
                             </Box>
                         </Stack>
@@ -296,11 +318,11 @@ const Dashboard = () => {
                 <Card sx={{ flex: 1, bgcolor: '#3498db', color: '#fff', borderRadius: 2, minWidth: 0 }}>
                     <CardContent>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                            <ConfirmationNumberIcon fontSize="large" />
+                             <AttachMoneyIcon fontSize="large" />
                             <Box>
                                 <Typography variant="h5" fontWeight={700}>{data.summary?.totalInvested || 0}</Typography>
-                                <Typography variant="body2">Total Invested</Typography>
-                                <Typography variant="caption">Transactions in System</Typography>
+                                <Typography variant="body2">Total Incoming</Typography>
+                              
                             </Box>
                         </Stack>
                     </CardContent>
@@ -308,12 +330,13 @@ const Dashboard = () => {
                 <Card sx={{ flex: 1, bgcolor: '#27ae60', color: '#fff', borderRadius: 2, minWidth: 0 }}>
                     <CardContent>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                            <MailIcon fontSize="large" />
+                            <AttachMoneyIcon fontSize="large" />
                             <Box>
-                                <Typography variant="h5" fontWeight={700}>{data.summary?.totalReferrals || 0}</Typography>
+                                {console.log(Number(data.summary?.totalInvested.split(' ')[0])-Number(data.summary?.totalEarned.split(' ')[0]))}
+                                <Typography variant="h5" fontWeight={700}>{Number(data.summary?.totalInvested.split(' ')[0])-Number(data.summary?.totalEarned.split(' ')[0])  || 0} USDT</Typography>
                                 {/* <Typography variant="h5" fontWeight={700}>{Number(data.summary.totalEarned.split(' ')[0]-Number(data.summary.totalInvested.split(' ')[0]))}</Typography> */}
-                                <Typography variant="body2">Total Referrals</Typography>
-                                <Typography variant="caption">Referrals in System</Typography>
+                                <Typography variant="body2">Net Profit</Typography>
+                                
                             </Box>
                         </Stack>
                     </CardContent>
@@ -397,12 +420,35 @@ const Dashboard = () => {
                     <CardContent>
                         <Typography variant="h6" fontWeight={600} mb={1}>Income Breakdown</Typography>
                         <Divider sx={{ mb: 2 }} />
+                        {/* Date filters */}
+                        <Stack direction="row" spacing={2} mb={2}>
+                            <TextField
+                                type="date"
+                                label="Start Date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <TextField
+                                type="date"
+                                label="End Date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Stack>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <Box sx={{ height: 300, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
-                                            data={incomeChartData}
+                                            data={incomeData ? Object.entries(incomeData).map(([key, value]) => ({
+                                                name: key,
+                                                value: value.totalAmount,
+                                                count: value.totalCount
+                                            })) : incomeChartData}
                                             cx="50%"
                                             cy="50%"
                                             innerRadius={60}
@@ -412,7 +458,7 @@ const Dashboard = () => {
                                             label={renderCustomizedLabel}
                                             labelLine={false}
                                         >
-                                            {incomeChartData.map((entry, index) => (
+                                            {(incomeData ? Object.keys(incomeData) : incomeChartData).map((entry, index) => (
                                                 <PieCell key={`cell-${index}`} fill={incomeColors[index % incomeColors.length]} />
                                             ))}
                                         </Pie>
@@ -428,21 +474,38 @@ const Dashboard = () => {
                             </Box>
                             {/* Custom Legend for Income Breakdown */}
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2, justifyContent: 'center' }}>
-                                {incomeChartData.map((income, index) => (
-                                    <Box key={income.name} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Box 
-                                            sx={{ 
-                                                width: 12, 
-                                                height: 12, 
-                                                backgroundColor: incomeColors[index % incomeColors.length],
-                                                borderRadius: '50%'
-                                            }} 
-                                        />
-                                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#333' }}>
-                                            {income.name} ({income.count})
-                                        </Typography>
-                                    </Box>
-                                ))}
+                                {incomeData
+                                    ? Object.entries(incomeData).map(([name, data], index) => (
+                                        <Box key={name} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box 
+                                                sx={{ 
+                                                    width: 12, 
+                                                    height: 12, 
+                                                    backgroundColor: incomeColors[index % incomeColors.length],
+                                                    borderRadius: '50%'
+                                                }} 
+                                            />
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#333' }}>
+                                                {name} ({data.totalCount})
+                                            </Typography>
+                                        </Box>
+                                    ))
+                                    : incomeChartData.map((item, index) => (
+                                        <Box key={item.name} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box 
+                                                sx={{ 
+                                                    width: 12, 
+                                                    height: 12, 
+                                                    backgroundColor: incomeColors[index % incomeColors.length],
+                                                    borderRadius: '50%'
+                                                }} 
+                                            />
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#333' }}>
+                                                {item.name} ({item.count})
+                                            </Typography>
+                                        </Box>
+                                    ))
+                                }
                             </Box>
                         </Box>
                     </CardContent>
