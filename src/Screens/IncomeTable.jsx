@@ -326,7 +326,7 @@ const IncomeTable = () => {
                         rowsPerPageOptions={[5, 10, 25, 50]}
                     />
                 </TableContainer>
-
+                {console.log('Selected Income:', selectedIncome)}
                 <Dialog open={detailOpen} onClose={handleCloseDetails} maxWidth="md" fullWidth>
                     <DialogTitle>Income Details</DialogTitle>
                     <DialogContent dividers>
@@ -336,7 +336,7 @@ const IncomeTable = () => {
                                 <Typography variant="body2">{selectedIncome?._id || selectedIncome?.id || ''}</Typography>
 
                                 <Typography variant="body2" color="text.secondary">User Name</Typography>
-                                <Typography variant="body2">{selectedIncome?.userName || selectedIncome?.user?.name || selectedIncome?.userId || ''}</Typography>
+                                <Typography variant="body2">{selectedIncome?.userName || selectedIncome?.userId?.name || selectedIncome?.userId || ''}</Typography>
 
                                 <Typography variant="body2" color="text.secondary">Amount</Typography>
                                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'green' }}>
